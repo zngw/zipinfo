@@ -1,4 +1,4 @@
-module zipinfo
+module github.com/zngw/zipinfo
 
 go 1.14
 

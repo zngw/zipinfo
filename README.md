@@ -102,3 +102,28 @@ user.json不存在或无配置时，以无验证模式启动
 * isp： 运营商
 * query: 查询的IP
 * param: 透传参数
+
+# 其他程序直接引用ip归属地
+
+## 安装
+
+```
+go get -u github.com/zngw/zipinfo
+```
+
+## 导入
+
+```go
+import github.com/zngw/zipinfo/ipinfo
+```
+
+## 初始化
+
+```go
+// 不初始化会安默认顺序判断，
+var defaultEnable = []string{"TaoBao","UserAgentInfo","Net126","BaiDu","PcOnline","IpApi"}
+ipinfo.Init(defaultEnable)
+
+// 使用
+err, info = ipinfo.GetIpInfo(ip)
+```

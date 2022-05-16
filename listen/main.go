@@ -8,6 +8,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/zngw/log"
+	"github.com/zngw/zipinfo/config"
+	"github.com/zngw/zipinfo/ipinfo"
+	"github.com/zngw/zipinfo/listen/cache"
+	"github.com/zngw/zipinfo/listen/cb"
+	"github.com/zngw/zipinfo/listen/httputil"
+	"github.com/zngw/zipinfo/listen/rdb"
 	"net"
 	"net/http"
 	"net/url"
@@ -15,12 +21,6 @@ import (
 	"runtime"
 	"syscall"
 	"time"
-	"zipinfo/config"
-	"zipinfo/ipinfo"
-	"zipinfo/listen/cache"
-	"zipinfo/listen/cb"
-	"zipinfo/listen/httputil"
-	"zipinfo/listen/rdb"
 )
 
 func main() {

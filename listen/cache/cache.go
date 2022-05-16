@@ -8,8 +8,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"zipinfo/ipinfo"
-	"zipinfo/listen/rdb"
+	"github.com/zngw/zipinfo/ipinfo"
+	"github.com/zngw/zipinfo/listen/rdb"
 )
 
 // 从Redis缓存在获取数据
