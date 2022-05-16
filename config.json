@@ -1,0 +1,6 @@
+{
+  "port": 8080,
+  "redis_": "redis://:Dcm123455.@120.55.190.209:6379",
+  "cacheDay": 30,
+  "third": ["TaoBao","UserAgentInfo","Net126","BaiDu","PcOnline","IpApi"]
+}
