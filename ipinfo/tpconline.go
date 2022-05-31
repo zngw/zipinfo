@@ -79,7 +79,12 @@ func (s *PcOnline) IpInfo(ip string) (info *IpInfo) {
 		info.Country = "国外"
 	}
 	if isp, ok := m["addr"]; ok {
-		info.Isp = isp.(string)
+		i := strings.Split(isp.(string), " ")
+		if len(i) == 2 {
+			info.Isp = i[1]
+		} else {
+			info.Isp = isp.(string)
+		}
 	}
 
 	info.Query = ip

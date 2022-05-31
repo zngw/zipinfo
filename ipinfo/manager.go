@@ -8,8 +8,7 @@ import (
 	"reflect"
 )
 
-
-var defaultEnable = []string{"TaoBao","UserAgentInfo","Net126","BaiDu","PcOnline","IpApi"}
+var defaultEnable = []string{"TaoBao", "UserAgentInfo", "Net126", "BaiDu", "PcOnline", "IpApi"}
 var infoRegistry = make(map[string]Base)
 var infos []Base
 

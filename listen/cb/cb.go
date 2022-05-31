@@ -7,6 +7,7 @@ package cb
 import (
 	"bytes"
 	"github.com/google/uuid"
+	"github.com/zngw/zchan"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -30,13 +31,15 @@ type Msg struct {
 // 初始化回调，不同次回调在不同管道
 func init() {
 	for i := 1; i <= cbTotalNum; i++ {
-		queue := New(100)
-		topics.Store(i, queue)
+		zchan, err := zchan.New(100)
+		if err == nil {
+			topics.Store(i, zchan)
+		}
 	}
 
 	topics.Range(func(key, value interface{}) bool {
 		go func() {
-			for v := range value.(*Queue).Out {
+			for v := range value.(*zchan.ZChan).Out {
 				msg := v.(Msg)
 				success := doCb(msg.Url, msg.Time, msg.Data)
 				if !success && msg.Count < cbTotalNum {
@@ -67,7 +70,7 @@ func Push(url string, count int, data []byte) {
 		return
 	}
 
-	queue.(*Queue).In <- msg
+	queue.(*zchan.ZChan).In <- msg
 }
 
 // 执行回调

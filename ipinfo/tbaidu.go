@@ -71,6 +71,13 @@ func (s *BaiDu) IpInfo(ip string) (info *IpInfo) {
 
 	md := data.(map[string]interface{})
 	if location, ok := md["location"]; ok {
+		l := strings.Split(location.(string), " ")
+		if len(l) != 2 {
+			return
+		}
+		info.Isp = l[1]
+		location = l[0]
+
 		r := strings.Split(location.(string), "省")
 		if len(r) == 2 {
 			info.Region = strings.TrimSpace(r[0])
@@ -82,19 +89,30 @@ func (s *BaiDu) IpInfo(ip string) (info *IpInfo) {
 				info.Isp = strings.TrimSpace(c[1])
 			}
 		} else if len(r) == 1 {
-			// 直辖市
-			c := strings.Split(r[0], "市")
-			if len(c) >= 2 {
-				info.Region = strings.TrimSpace(c[0])
-				info.City = strings.TrimSpace(c[1])
-			}
+			// 自治区
+			if strings.Index(r[0], "自治区") > 0 {
+				c := strings.Split(r[0], "自治区")
+				if len(c) == 2 {
+					info.Region = strings.TrimSpace(c[0]) + "自治区"
+					info.City = strings.TrimSpace(c[1])
+				} else {
+					return
+				}
+			} else {
+				// 直辖市
+				c := strings.Split(r[0], "市")
+				if len(c) >= 2 {
+					info.Region = strings.TrimSpace(c[0])
+					info.City = strings.TrimSpace(c[1])
+				}
 
-			if len(c) == 3 {
-				info.Isp = strings.TrimSpace(c[2])
-			}
+				if len(c) == 3 {
+					info.Isp = strings.TrimSpace(c[2])
+				}
 
-			if len(c) == 1 {
-				info.Country = c[0]
+				if len(c) == 1 {
+					info.Country = c[0]
+				}
 			}
 		}
 	}

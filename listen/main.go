@@ -24,6 +24,11 @@ import (
 )
 
 func main() {
+	err, info := ipinfo.GetIpInfo("106.125.109.169")
+	if err == nil {
+		log.Error("sys", info.Region)
+	}
+
 	// 加载配置
 	port := 8080
 	cfg := config.LoadConfig()

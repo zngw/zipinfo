@@ -169,6 +169,14 @@ github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9dec
 github.com/yuin/gopher-lua v0.0.0-20171031051903-609c9cd26973/go.mod h1:aEV29XrmTYFr3CiRxZeGHpkvbwq+prZduBqMaascyCU=
 github.com/zngw/log v1.2.2 h1:D3+9qIpGxWXLSbTRPSSatJUk6nWUlyVjRVgRpBVGXPI=
 github.com/zngw/log v1.2.2/go.mod h1:BsO9GbG58WzuGolwV9SId/mf7RyxoUR/B0G1YibJk80=
+github.com/zngw/ringbuffer v1.0.0 h1:xGl/GgtZzGBvaPO9bONkw7s4cH5Qrallm9/qcR25qhw=
+github.com/zngw/ringbuffer v1.0.0/go.mod h1:mGLUcwWVDI7mNt/w+OyERwbF4r2ySJHUyWORJDrJQOY=
+github.com/zngw/ringbuffer v1.1.0 h1:TEHwiT+vPV3mucJncQuZtvcpxuwBc1kHUqauJvk0TB4=
+github.com/zngw/ringbuffer v1.1.0/go.mod h1:mGLUcwWVDI7mNt/w+OyERwbF4r2ySJHUyWORJDrJQOY=
+github.com/zngw/zchan v1.0.0 h1:QmFjkwtencwZGex3nQNIw7WqykAxKHoX+k3HkWevxUA=
+github.com/zngw/zchan v1.0.0/go.mod h1:yRGStNyLKzBes+T2ROdc9ReRLbzHXyRbA9vq/PZBfC4=
+github.com/zngw/zchan v1.1.0 h1:o2b9TyjG0SA23PjfYAPWjOSbt7tQNHfDoWFRADdxH90=
+github.com/zngw/zchan v1.1.0/go.mod h1:tLYx8JuZDMmYsIHPbRt9rwcWnb45RQFcYQm+JbVc6O0=
 go.etcd.io/etcd v3.3.25+incompatible/go.mod h1:yaeTdrJi5lOmYerz05bd8+V7KubZs8YSFZfzsF9A6aI=
 go.uber.org/atomic v1.6.0/go.mod h1:sABNBOSYdrvTF6hTgEIbc7YasKWGhgEQZyfxyTvoXHQ=
 go.uber.org/multierr v1.5.0/go.mod h1:FeouvMocqHpRaaGuG9EjoKcStLC43Zu/fmqdUMPcKYU=
