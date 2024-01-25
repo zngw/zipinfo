@@ -7,17 +7,31 @@ package ipinfo
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"reflect"
 	"time"
 )
 
 type TaoBao struct {
+	Url  string
+	Free bool
 }
 
 func init() {
 	registerInfo(new(TaoBao))
+}
+
+func (s *TaoBao) Init(cfg interface{}) bool {
+	m := cfg.(map[string]interface{})
+	s.Url = m["url"].(string)
+	s.Free = m["free"].(bool)
+
+	return true
+}
+
+func (s *TaoBao) CanFree() bool {
+	return s.Free
 }
 
 // 淘宝ip地址库
@@ -27,9 +41,9 @@ func (s *TaoBao) IpInfo(ip string) (info *IpInfo) {
 	info.Status = "fail"
 	info.Type = reflect.TypeOf(s).Elem().Name()
 
-	url := fmt.Sprintf("https://ip.taobao.com/outGetIpInfo?ip=%s&accessKey=alibaba-inc", ip)
+	url := fmt.Sprintf(s.Url, ip)
 	client := &http.Client{
-		Timeout: time.Millisecond * 500,
+		Timeout: time.Millisecond * 3000,
 	}
 	req, _ := http.NewRequest("GET", url, nil)
 	resp, err := client.Do(req)
@@ -39,7 +53,7 @@ func (s *TaoBao) IpInfo(ip string) (info *IpInfo) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil || resp.StatusCode != 200 {
 		// 读取网页数据错误
 		return

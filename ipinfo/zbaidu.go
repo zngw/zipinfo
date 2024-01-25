@@ -7,7 +7,7 @@ package ipinfo
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"reflect"
 	"strings"
@@ -15,22 +15,36 @@ import (
 )
 
 type BaiDu struct {
+	Url  string
+	Free bool
 }
 
 func init() {
 	registerInfo(new(BaiDu))
 }
 
-// 太平洋电脑网接口
+func (s *BaiDu) Init(cfg interface{}) bool {
+	m := cfg.(map[string]interface{})
+	s.Url = m["url"].(string)
+	s.Free = m["free"].(bool)
+
+	return true
+}
+
+func (s *BaiDu) CanFree() bool {
+	return s.Free
+}
+
+// 百度接口
 // 无国家显示
 func (s *BaiDu) IpInfo(ip string) (info *IpInfo) {
 	info = new(IpInfo)
 	info.Status = "fail"
 	info.Type = reflect.TypeOf(s).Elem().Name()
 
-	url := fmt.Sprintf("https://opendata.baidu.com/api.php?query=%s&co=&resource_id=6006&oe=utf8", ip)
+	url := fmt.Sprintf(s.Url, ip)
 	client := &http.Client{
-		Timeout: time.Millisecond * 500,
+		Timeout: time.Millisecond * 1000,
 	}
 	req, _ := http.NewRequest("GET", url, nil)
 	resp, err := client.Do(req)
@@ -40,7 +54,7 @@ func (s *BaiDu) IpInfo(ip string) (info *IpInfo) {
 	}
 
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil || resp.StatusCode != 200 {
 		// 读取网页数据错误
 		return

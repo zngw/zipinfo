@@ -12,5 +12,7 @@ const (
 )
 
 type Base interface {
+	Init(cfg interface{}) bool
 	IpInfo(ip string) *IpInfo
+	CanFree() bool
 }

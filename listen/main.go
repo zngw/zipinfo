@@ -24,21 +24,13 @@ import (
 )
 
 func main() {
-	err, info := ipinfo.GetIpInfo("106.125.109.169")
-	if err == nil {
-		log.Error("sys", info.Region)
-	}
-
 	// 加载配置
-	port := 8080
-	cfg := config.LoadConfig()
-	if cfg != nil {
-		ipinfo.Init(cfg.Third)
-		port = cfg.Port
+	config.LoadConfig()
+	ipinfo.Init(config.Cfg.Third)
+	port := config.Cfg.Port
 
-		// 初始化Redis
-		rdb.InitRedis(cfg.Redis, cfg.CacheDay)
-	}
+	// 初始化Redis
+	rdb.InitRedis(config.Cfg.Redis, config.Cfg.CacheDay)
 
 	// 监听
 	r := &httputil.Router{}
@@ -62,12 +54,15 @@ func query(w http.ResponseWriter, r *http.Request) {
 	// 获取客户端参数
 	param := r.URL.Query()
 	ip := param.Get("ip")
+	free := true
 	if ip == "" {
 		// ip 不存在，查询当前访问ip，跳过验证
 		ip = httputil.GetIP(r)
 	} else {
 		// 验证用户查询权限
-		if !httputil.Authentication(param) {
+		if httputil.Authentication(param) {
+			free = false
+		} else if !config.Cfg.Free {
 			query, _ := url.QueryUnescape(r.URL.RawQuery)
 			log.Trace("net", query+":验证失败！")
 			_ = httputil.Send(w, []byte(`{"status":"fail","msg":"验证失败！"}`))
@@ -75,11 +70,11 @@ func query(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	url := param.Get("url") // 回调地址
-	p := param.Get("param") // 透传参数
+	cbUrl := param.Get("url") // 回调地址
+	p := param.Get("param")   // 透传参数
 
 	// 如果存在回调，先返回，再异步通知
-	if url != "" {
+	if cbUrl != "" {
 		err := httputil.Send(w, []byte(`{"status":"success"}`))
 		if err != nil {
 			log.Error("sys", err.Error())
@@ -91,7 +86,7 @@ func query(w http.ResponseWriter, r *http.Request) {
 
 	// 变量请求3次
 	for i := 0; i < 3; i++ {
-		err, info := getIpInfo(ip)
+		err, info := getIpInfo(ip, free)
 		if err == nil {
 			info.Param = p
 			data, err = json.Marshal(info)
@@ -108,17 +103,17 @@ func query(w http.ResponseWriter, r *http.Request) {
 		data = []byte(`{"status":"fail","msg":"获取数据失败"}`)
 	}
 
-	if url == "" {
+	if cbUrl == "" {
 		// 不存在回调，直接返回数据
 		_ = httputil.Send(w, data)
 	} else {
 		// 添加到回调队列
-		cb.Push(url, 1, data)
+		cb.Push(cbUrl, 1, data)
 	}
 }
 
 // 获取ip数据
-func getIpInfo(ip string) (err error, info *ipinfo.IpInfo) {
+func getIpInfo(ip string, free bool) (err error, info *ipinfo.IpInfo) {
 	// 验证IP是否合法
 	address := net.ParseIP(ip)
 	if address == nil {
@@ -131,7 +126,7 @@ func getIpInfo(ip string) (err error, info *ipinfo.IpInfo) {
 		return
 	}
 
-	err, info = ipinfo.GetIpInfo(ip)
+	err, info = ipinfo.GetIpInfo(ip, free)
 	if err == nil {
 		cache.SetIpInfoByRedis(ip, info)
 	}

@@ -1,6 +1,6 @@
 # 获取IP归属地接口
 
-本程序集合了 淘宝、ip.useragentinfo.com、网易126.net、百度、太平洋、ip-api.com等免费IP归属地Api接口，将各网页提供的数据以json格式时实或异步返回。  
+本程序集合了 淘宝、ip.useragentinfo.com、网易126.net、百度、太平洋、ip-api.com等免费IP归属地Api接口，ip138收费IP归属地Api接口，将各网页提供的数据以json格式时实或异步返回。  
 
 ## 1.直接访问
 
@@ -43,27 +43,74 @@ key计算=`md5(36.18.115.152id123http://192.168.0.1:8080/ipcbtmpf1ae62e1c76c5150
 
 ## 1. 基本配置，config.json
 
-如果config.json配置文件不存在时，会有默认8080端口，无redis缓存运行
+如果config.json配置文件不存在时，默认配置
 
 ```json
 {
   "port": 8080,
-  "redis_": "redis://:123455@127.0.0.1:6379",
+  "redis": "redis://:123456@127.0.0.1:6379",
   "cacheDay": 30,
-  "third": ["TaoBao","UserAgentInfo","Net126","BaiDu","PcOnline","IpApi"]
+  "free": true,
+  "third":
+  [
+    {
+      "name": "zipinfo",
+      "free": true,
+      "url": "http://127.0.0.1:80",
+      "user": "tmp",
+      "token": "f1ae62e1c76c5150f9b0d7e17db95dac"
+    },
+    {
+      "name": "ip138",
+      "free": false,
+      "url": "https://api.ipshudi.com/ip/?ip=%s&datatype=jsonp",
+      "token": "ip138提供的token"
+    },
+    {
+      "name": "baidu",
+      "free": true,
+      "url": "https://opendata.baidu.com/api.php?query=%s&co=&resource_id=6006&oe=utf8"
+    },
+    {
+      "name": "taobao",
+      "free": true,
+      "url": "https://ip.taobao.com/outGetIpInfo?ip=%s&accessKey=alibaba-inc"
+    },
+    {
+      "name": "useragentinfo",
+      "free": true,
+      "url": "https://ip.useragentinfo.com/json?ip=%s"
+    },
+    {
+      "name": "ipapi",
+      "free": true,
+      "url": "http://ip-api.com/json/%s?lang=zh-CN"
+    },
+    {
+      "name": "pconline",
+      "free": true,
+      "url": "https://whois.pconline.com.cn/ipJson.jsp?ip=%s&json=true"
+    }
+  ]
 }
 ```
 
 * port： 监听端口
 * redis：redis链接，配置不存在或为空时，不启用redis缓存
 * cacheDay： 缓时天数
+* free：是否开启免费查询功能，免费查询只能调用free标志为true的第三方接口
 * third：启用第三方ip归属地查询顺序，目前支持：
-> TaoBao: 淘宝  
-> UserAgentInfo: ip.useragentinfo.com  
-> Net126: 网易126.net  
-> BaiDu： 百度  
-> PcOnline： 太平洋  
-> IpApi： ip-api.com  
+> name、free、url为必须字段   
+> free: 该第三方平台是否为免费查询用户使用  
+> url: 第三方平台的请求地址  
+> name：第三方接口
+>> zipinfo: 同款软件之间获取IP   
+>> ip138: iP138查询网
+>> baidu： 百度  
+>> taobao: 淘宝  
+>> useragentinfo: ip.useragentinfo.com  
+>> pconline： 太平洋  
+>> ipapi： ip-api.com
 
 ## 2. 权限用户配置, user.json
 
@@ -75,7 +122,6 @@ user.json不存在或无配置时，以无验证模式启动
   "tmp": "f1ae62e1c76c5150f9b0d7e17db95dac"
 }
 ```
-
 
 # 返回数据
 
@@ -120,9 +166,6 @@ import github.com/zngw/zipinfo/ipinfo
 ## 初始化
 
 ```go
-// 不初始化会安默认顺序判断，
-var defaultEnable = []string{"TaoBao","UserAgentInfo","Net126","BaiDu","PcOnline","IpApi"}
-ipinfo.Init(defaultEnable)
 
 // 使用
 err, info = ipinfo.GetIpInfo(ip)

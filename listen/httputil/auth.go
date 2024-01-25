@@ -5,10 +5,9 @@
 package httputil
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"github.com/zngw/log"
+	"github.com/zngw/zipinfo/util"
 	"io/ioutil"
 	"net/url"
 	"sort"
@@ -61,13 +60,7 @@ func Authentication(param url.Values) bool {
 	}
 	data += Key
 
-	return param.Get("key") == md5StrToHex(data)
-}
-
-func md5StrToHex(txt string) string {
-	m := md5.New()
-	m.Write([]byte(txt))
-	return hex.EncodeToString(m.Sum(nil))
+	return param.Get("key") == util.Md5Str(data)
 }
 
 func getUserKey(user string) (key string, ok bool) {

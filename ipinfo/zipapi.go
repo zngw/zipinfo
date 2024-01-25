@@ -1,52 +1,67 @@
 // @Title
 // @Description $
 // @Author  55
-// @Date  2022/5/16
+// @Date  2022/5/12
 package ipinfo
 
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"reflect"
 	"strings"
 	"time"
 )
 
-type UserAgentInfo struct {
+type IpApi struct {
+	Url  string
+	Free bool
 }
 
 func init() {
-	registerInfo(new(UserAgentInfo))
+	registerInfo(new(IpApi))
 }
 
-// ip.useragentinfo.com
-// 直接调用即可【没有频率限制】
-func (s *UserAgentInfo) IpInfo(ip string) (info *IpInfo) {
+func (s *IpApi) Init(cfg interface{}) bool {
+	m := cfg.(map[string]interface{})
+	s.Url = m["url"].(string)
+	s.Free = m["free"].(bool)
+
+	return true
+}
+
+func (s *IpApi) CanFree() bool {
+	return s.Free
+}
+
+// 通过ip-api.com获取ip地理位置信息
+// 由于ip-api.com是国外的网站，对国内市级ip位置有一定误差
+func (s *IpApi) IpInfo(ip string) (info *IpInfo) {
 	info = new(IpInfo)
 	info.Status = "fail"
 	info.Type = reflect.TypeOf(s).Elem().Name()
 
-	url := fmt.Sprintf("https://ip.useragentinfo.com/json?ip=%s", ip)
+	url := fmt.Sprintf(s.Url, ip)
 	client := &http.Client{
-		Timeout: time.Millisecond * 500,
+		Timeout: time.Millisecond * 3000,
 	}
 	req, _ := http.NewRequest("GET", url, nil)
 	resp, err := client.Do(req)
 	if err != nil {
-		// 读取网页数据错误
+		// 获取不到地理位置，
 		return
 	}
 	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil || resp.StatusCode != 200 {
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
 		// 读取网页数据错误
 		return
 	}
-
-	var m map[string]interface{}
+	if resp.StatusCode != 200 {
+		return
+	}
+	m := make(map[string]interface{})
 	err = json.Unmarshal(body, &m)
 	if err != nil {
 		// 网页解析错误
@@ -58,7 +73,7 @@ func (s *UserAgentInfo) IpInfo(ip string) (info *IpInfo) {
 		info.Country = c.(string)
 	}
 
-	if r, ok := m["province"]; ok {
+	if r, ok := m["regionName"]; ok {
 		info.Region = strings.ReplaceAll(strings.ReplaceAll(r.(string), "省", ""), "市", "")
 	}
 

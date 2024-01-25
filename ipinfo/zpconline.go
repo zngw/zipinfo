@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"reflect"
@@ -18,10 +19,24 @@ import (
 )
 
 type PcOnline struct {
+	Url  string
+	Free bool
 }
 
 func init() {
 	registerInfo(new(PcOnline))
+}
+
+func (s *PcOnline) Init(cfg interface{}) bool {
+	m := cfg.(map[string]interface{})
+	s.Url = m["url"].(string)
+	s.Free = m["free"].(bool)
+
+	return true
+}
+
+func (s *PcOnline) CanFree() bool {
+	return s.Free
 }
 
 // 太平洋电脑网接口
@@ -31,9 +46,9 @@ func (s *PcOnline) IpInfo(ip string) (info *IpInfo) {
 	info.Status = "fail"
 	info.Type = reflect.TypeOf(s).Elem().Name()
 
-	url := fmt.Sprintf("https://whois.pconline.com.cn/ipJson.jsp?ip=%s&json=true", ip)
+	url := fmt.Sprintf(s.Url, ip)
 	client := &http.Client{
-		Timeout: time.Millisecond * 500,
+		Timeout: time.Millisecond * 3000,
 	}
 	req, _ := http.NewRequest("GET", url, nil)
 	resp, err := client.Do(req)
@@ -43,7 +58,7 @@ func (s *PcOnline) IpInfo(ip string) (info *IpInfo) {
 	}
 
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil || resp.StatusCode != 200 {
 		// 读取网页数据错误
 		return

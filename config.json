@@ -2,5 +2,46 @@
   "port": 8080,
   "redis_": "redis://:Dcm123455.@120.55.190.209:6379",
   "cacheDay": 30,
-  "third": ["TaoBao","UserAgentInfo","Net126","BaiDu","PcOnline","IpApi"]
+  "free": true,
+  "third":
+    [
+      {
+        "name": "ip138",
+        "free": false,
+        "url": "http://ip.zengwu.com.cn",
+        "user": "tmp",
+        "token": ""
+      },
+      {
+        "name": "ip138",
+        "free": false,
+        "url": "https://api.ipshudi.com/ip/?ip=%s&datatype=jsonp",
+        "token": "ip138 token"
+      },
+      {
+        "name": "baidu",
+        "free": true,
+        "url": "https://opendata.baidu.com/api.php?query=%s&co=&resource_id=6006&oe=utf8"
+      },
+      {
+        "name": "taobao",
+        "free": true,
+        "url": "https://ip.taobao.com/outGetIpInfo?ip=%s&accessKey=alibaba-inc"
+      },
+      {
+        "name": "useragentinfo",
+        "free": true,
+        "url": "https://ip.useragentinfo.com/json?ip=%s"
+      },
+      {
+        "name": "ipapi",
+        "free": true,
+        "url": "http://ip-api.com/json/%s?lang=zh-CN"
+      },
+      {
+        "name": "pconline",
+        "free": true,
+        "url": "https://whois.pconline.com.cn/ipJson.jsp?ip=%s&json=true"
+      }
+    ]
 }

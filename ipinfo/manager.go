@@ -6,25 +6,28 @@ package ipinfo
 
 import (
 	"reflect"
+	"strings"
 )
 
-var defaultEnable = []string{"TaoBao", "UserAgentInfo", "Net126", "BaiDu", "PcOnline", "IpApi"}
 var infoRegistry = make(map[string]Base)
 var infos []Base
 
 func registerInfo(info Base) {
 	t := reflect.TypeOf(info).Elem()
-	infoRegistry[t.Name()] = info
-
-	Init(defaultEnable)
+	infoRegistry[strings.ToLower(t.Name())] = info
 }
 
 // 输入生效的第三方库及调用顺序
-func Init(enables []string) {
-	if enables != nil {
-		for _, t := range enables {
-			if info, ok := infoRegistry[t]; ok {
-				infos = append(infos, info)
+func Init(third []interface{}) {
+	infos = nil
+	if third != nil {
+		for _, v := range third {
+			if k, ok := v.(map[string]interface{})["name"]; ok {
+				if info, ok := infoRegistry[k.(string)]; ok {
+					if info.Init(v) {
+						infos = append(infos, info)
+					}
+				}
 			}
 		}
 	}
@@ -32,10 +35,14 @@ func Init(enables []string) {
 	return
 }
 
-func GetIpInfo(ip string) (err error, info *IpInfo) {
+func GetIpInfo(ip string, free bool) (err error, info *IpInfo) {
 	var result = InfoTypeFail
 	for i, _ := range infos {
 		tc := infos[i]
+		if free && !tc.CanFree() {
+			continue
+		}
+
 		tmp := tc.IpInfo(ip)
 		if tmp == nil {
 			continue

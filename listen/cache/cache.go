@@ -19,7 +19,7 @@ func GetIpInfoByRedis(ip string) (err error, info *ipinfo.IpInfo) {
 		return
 	}
 
-	data, err := rdb.Redis.Get(context.Background(), "ipinfo:"+ip).Result()
+	data, err := rdb.Redis.Get(context.Background(), "IpInfo:"+ip).Result()
 	if err != nil {
 		return
 	}
@@ -43,6 +43,6 @@ func SetIpInfoByRedis(ip string, info *ipinfo.IpInfo) {
 
 	// redis缓存一个月
 	if rdb.CacheTime > 0 {
-		rdb.Redis.Set(context.Background(), "ipinfo:"+ip, data, rdb.CacheTime)
+		rdb.Redis.Set(context.Background(), "IpInfo:"+ip, data, rdb.CacheTime)
 	}
 }
