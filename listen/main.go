@@ -126,7 +126,7 @@ func getIpInfo(ip string, free bool) (err error, info *ipinfo.IpInfo) {
 		return
 	}
 
-	err, info = ipinfo.GetIpInfo(ip, free)
+	err, info = ipinfo.GetIpInfoFree(ip, free)
 	if err == nil {
 		cache.SetIpInfoByRedis(ip, info)
 	}

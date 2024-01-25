@@ -35,7 +35,7 @@ func Init(third []interface{}) {
 	return
 }
 
-func GetIpInfo(ip string, free bool) (err error, info *IpInfo) {
+func GetIpInfoFree(ip string, free bool) (err error, info *IpInfo) {
 	var result = InfoTypeFail
 	for i, _ := range infos {
 		tc := infos[i]
@@ -64,4 +64,8 @@ func GetIpInfo(ip string, free bool) (err error, info *IpInfo) {
 	}
 
 	return
+}
+
+func GetIpInfo(ip string) (err error, info *IpInfo) {
+	return GetIpInfoFree(ip, false)
 }
