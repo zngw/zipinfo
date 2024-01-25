@@ -5,6 +5,7 @@
 package ipinfo
 
 import (
+	"github.com/zngw/zipinfo/config"
 	"reflect"
 	"strings"
 )
@@ -36,6 +37,10 @@ func Init(third []interface{}) {
 }
 
 func GetIpInfoFree(ip string, free bool) (err error, info *IpInfo) {
+	if infos == nil {
+		Init(config.Cfg.Third)
+	}
+
 	var result = InfoTypeFail
 	for i, _ := range infos {
 		tc := infos[i]
